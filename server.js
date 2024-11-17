@@ -16,6 +16,11 @@ cloudinary.config({
     api_secret:process.env.CLOUDINARY_API_SECRET
 })
 
+const allowedOrigins = [
+  'http://localhost:5173',  // Development
+  'https://blogs-app-frontend-virid.vercel.app', // Production
+];
+
 const app = express();
 app.get('/',(req,res)=>{
     res.send("Hello World")
@@ -23,8 +28,14 @@ app.get('/',(req,res)=>{
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors({
-    origin: 'http://localhost:5173', 
-    credentials: true                 
+  origin: (origin, callback) => {
+    if (allowedOrigins.includes(origin) || !origin) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true, // If you need to send cookies
 }));
 //! databse;
 dbConnect();
